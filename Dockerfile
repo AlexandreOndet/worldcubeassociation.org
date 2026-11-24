@@ -166,6 +166,11 @@ RUN "$PLAYWRIGHT_BROWSERS_PATH/node_modules/playwright/cli.js" install-deps chro
 # Get Certificate to connect to mysql via SSL
 RUN curl -o ./rds-cert.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 
+# Install the Debian fixes released since the `ruby` image and the cached `apt-get install` layers above were built.
+#   Keep this step below the COPY from the `build` stage: that COPY changes with every commit, which makes Docker run the upgrade again.
+RUN apt-get update -qq && \
+    apt-get upgrade -y
+
 USER rails:rails
 
 FROM runtime AS sidekiq
